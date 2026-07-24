@@ -37,3 +37,7 @@ export const updateTaskValidation = [
   body('assignedTo').optional().trim().notEmpty().withMessage('AssignedTo cannot be empty string'),
   body('completed').optional().isBoolean().withMessage('Completed must be a boolean')
 ];
+
+export const updateTaskStatusValidation = [
+  body('status').notEmpty().withMessage('Status is required').isIn(['Pending', 'In Progress', 'Done']).withMessage('Invalid status')
+];

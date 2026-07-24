@@ -62,6 +62,18 @@ export const deleteTask = (req, res) => {
   }
 };
 
+export const updateTaskStatus = (req, res) => {
+  try {
+    const task = TaskService.updateTask(req.params.id, { status: req.body.status });
+    if (!task) {
+      return res.status(404).json({ error: "Task not found" });
+    }
+    return successResponse(res, 200, "Task status updated successfully", task);
+  } catch (error) {
+    return errorResponse(res, 500, "Error updating task status", [error.message]);
+  }
+};
+
 export const getTaskStats = (req, res) => {
   try {
     const stats = TaskService.getStats();

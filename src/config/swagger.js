@@ -11,6 +11,9 @@ export const swaggerSpec = {
       description: 'Development server',
     },
   ],
+  tags: [
+    { name: 'Tasks', description: 'Task management operations' }
+  ],
   components: {
     schemas: {
       Task: {
@@ -33,6 +36,7 @@ export const swaggerSpec = {
   paths: {
     '/tasks': {
       get: {
+        tags: ['Tasks'],
         summary: 'Get all tasks',
         description: 'Returns all tasks, optionally filtered by status, priority, assignedTo, or search string',
         parameters: [
@@ -46,6 +50,7 @@ export const swaggerSpec = {
         }
       },
       post: {
+        tags: ['Tasks'],
         summary: 'Create a new task',
         description: 'Creates a task and returns it',
         requestBody: {
@@ -73,6 +78,7 @@ export const swaggerSpec = {
     },
     '/tasks/{id}': {
       get: {
+        tags: ['Tasks'],
         summary: 'Get task by ID',
         parameters: [{ in: 'path', name: 'id', required: true, schema: { type: 'string' } }],
         responses: {
@@ -81,7 +87,8 @@ export const swaggerSpec = {
         }
       },
       put: {
-        summary: 'Update a task',
+        tags: ['Tasks'],
+        summary: 'Update a task completely',
         parameters: [{ in: 'path', name: 'id', required: true, schema: { type: 'string' } }],
         requestBody: {
           required: true,
@@ -107,10 +114,38 @@ export const swaggerSpec = {
         }
       },
       delete: {
+        tags: ['Tasks'],
         summary: 'Delete a task',
         parameters: [{ in: 'path', name: 'id', required: true, schema: { type: 'string' } }],
         responses: {
           '204': { description: 'Task deleted successfully' },
+          '404': { description: 'Task not found' }
+        }
+      }
+    },
+    '/tasks/{id}/status': {
+      patch: {
+        tags: ['Tasks'],
+        summary: 'Update task status',
+        description: 'Partially update only the status of a task',
+        parameters: [{ in: 'path', name: 'id', required: true, schema: { type: 'string' } }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['status'],
+                properties: {
+                  status: { type: 'string', enum: ['Pending', 'In Progress', 'Done'] }
+                }
+              }
+            }
+          }
+        },
+        responses: {
+          '200': { description: 'Task status updated successfully' },
+          '400': { description: 'Validation errors' },
           '404': { description: 'Task not found' }
         }
       }

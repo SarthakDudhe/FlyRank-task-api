@@ -44,6 +44,7 @@ antigravity-task-api/
 | GET | `/tasks/:id` | Get task by ID |
 | POST | `/tasks` | Create a new task |
 | PUT | `/tasks/:id` | Update an existing task |
+| PATCH| `/tasks/:id/status` | Update only the task status |
 | DELETE | `/tasks/:id` | Delete a task |
 | GET | `/stats` | Get task statistics |
 | POST | `/reset` | Reset tasks to default seeds |
