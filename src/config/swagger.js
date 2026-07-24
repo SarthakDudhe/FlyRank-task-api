@@ -1,9 +1,9 @@
 export const swaggerSpec = {
   openapi: '3.0.0',
   info: {
-    title: 'Antigravity Task API',
+    title: 'FlyRank AI Task API',
     version: '1.0.0',
-    description: 'Task Management API for Antigravity',
+    description: 'Task Management API for FlyRank AI',
   },
   servers: [
     {

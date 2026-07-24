@@ -1,6 +1,6 @@
-# Antigravity Task API
+# FlyRank AI Task API
 
-Task Management API for Antigravity. An in-memory RESTful service built with Node.js, Express, and ES Modules.
+Task Management API for FlyRank AI. An in-memory RESTful service built with Node.js, Express, and ES Modules.
 
 ## Features
 - In-memory CRUD operations for Tasks
@@ -12,7 +12,7 @@ Task Management API for Antigravity. An in-memory RESTful service built with Nod
 
 ## Folder Structure
 ```
-antigravity-task-api/
+flyrank-task-api/
 ├── src/
 │   ├── config/          # Configuration files (Swagger, etc.)
 │   ├── controllers/     # Request/Response logic

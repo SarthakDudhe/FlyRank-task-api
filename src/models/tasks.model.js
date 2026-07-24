@@ -5,7 +5,7 @@ const initialTasks = [
   {
     id: uuidv4(),
     title: "Implement Community Feed",
-    description: "Build infinite scrolling feed for Antigravity platform",
+    description: "Build infinite scrolling feed for FlyRank AI platform",
     priority: "High",
     status: "In Progress",
     assignedTo: "Sarthak Dudhe",
@@ -27,7 +27,7 @@ const initialTasks = [
   {
     id: uuidv4(),
     title: "Design Landing Page",
-    description: "Create responsive UI for Antigravity home page",
+    description: "Create responsive UI for FlyRank AI home page",
     priority: "Medium",
     status: "Done",
     assignedTo: "Frontend Team",

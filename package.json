@@ -1,7 +1,7 @@
 {
-  "name": "antigravity-task-api",
+  "name": "flyrank-task-api",
   "version": "1.0.0",
-  "description": "Task Management API for Antigravity",
+  "description": "Task Management API for FlyRank AI",
   "main": "src/server.js",
   "type": "module",
   "scripts": {

@@ -33,9 +33,9 @@ app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // Base route
 app.get('/', (req, res) => {
   res.status(200).json({
-    name: "Antigravity Task API",
+    name: "FlyRank AI Task API",
     version: "1.0",
-    description: "Task Management API for Antigravity",
+    description: "Task Management API for FlyRank AI",
     author: "Sarthak Dudhe",
     documentation: "/docs"
   });
