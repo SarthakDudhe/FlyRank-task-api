@@ -1,97 +1,68 @@
 import * as TaskService from '../services/tasks.service.js';
-import { successResponse, errorResponse } from '../utils/response.js';
+import { successResponse } from '../utils/response.js';
+import catchAsync from '../utils/catchAsync.js';
+import AppError from '../utils/AppError.js';
 
-export const getTasks = (req, res) => {
-  try {
-    const filters = {
-      status: req.query.status,
-      priority: req.query.priority,
-      assignedTo: req.query.assignedTo,
-      search: req.query.search,
-      sortBy: req.query.sortBy,
-      order: req.query.order,
-      page: req.query.page,
-      limit: req.query.limit
-    };
-    
-    const result = TaskService.getAllTasks(filters);
-    return successResponse(res, 200, "Tasks retrieved successfully", result);
-  } catch (error) {
-    return errorResponse(res, 500, "Error retrieving tasks", [error.message]);
-  }
-};
+export const getTasks = catchAsync(async (req, res, next) => {
+  const filters = {
+    status: req.query.status,
+    priority: req.query.priority,
+    assignedTo: req.query.assignedTo,
+    search: req.query.search,
+    sortBy: req.query.sortBy,
+    order: req.query.order,
+    page: req.query.page,
+    limit: req.query.limit
+  };
+  
+  // Awaiting the service call simulates a real DB interaction (e.g. MongoDB)
+  const result = await TaskService.getAllTasks(filters);
+  return successResponse(res, 200, "Tasks retrieved successfully", result);
+});
 
-export const getTaskById = (req, res) => {
-  try {
-    const task = TaskService.getTaskById(req.params.id);
-    if (!task) {
-      return res.status(404).json({ error: "Task not found" });
-    }
-    return successResponse(res, 200, "Task retrieved successfully", task);
-  } catch (error) {
-    return errorResponse(res, 500, "Error retrieving task", [error.message]);
+export const getTaskById = catchAsync(async (req, res, next) => {
+  const task = await TaskService.getTaskById(req.params.id);
+  if (!task) {
+    return next(new AppError("Task not found", 404));
   }
-};
+  return successResponse(res, 200, "Task retrieved successfully", task);
+});
 
-export const createTask = (req, res) => {
-  try {
-    const task = TaskService.createTask(req.body);
-    return successResponse(res, 201, "Task created successfully", task);
-  } catch (error) {
-    return errorResponse(res, 500, "Error creating task", [error.message]);
-  }
-};
+export const createTask = catchAsync(async (req, res, next) => {
+  const task = await TaskService.createTask(req.body);
+  return successResponse(res, 201, "Task created successfully", task);
+});
 
-export const updateTask = (req, res) => {
-  try {
-    const task = TaskService.updateTask(req.params.id, req.body);
-    if (!task) {
-      return res.status(404).json({ error: "Task not found" });
-    }
-    return successResponse(res, 200, "Task updated successfully", task);
-  } catch (error) {
-    return errorResponse(res, 500, "Error updating task", [error.message]);
+export const updateTask = catchAsync(async (req, res, next) => {
+  const task = await TaskService.updateTask(req.params.id, req.body);
+  if (!task) {
+    return next(new AppError("Task not found", 404));
   }
-};
+  return successResponse(res, 200, "Task updated successfully", task);
+});
 
-export const deleteTask = (req, res) => {
-  try {
-    const deleted = TaskService.deleteTask(req.params.id);
-    if (!deleted) {
-      return res.status(404).json({ error: "Task not found" });
-    }
-    return res.status(204).send();
-  } catch (error) {
-    return errorResponse(res, 500, "Error deleting task", [error.message]);
+export const updateTaskStatus = catchAsync(async (req, res, next) => {
+  const task = await TaskService.updateTask(req.params.id, { status: req.body.status });
+  if (!task) {
+    return next(new AppError("Task not found", 404));
   }
-};
+  return successResponse(res, 200, "Task status updated successfully", task);
+});
 
-export const updateTaskStatus = (req, res) => {
-  try {
-    const task = TaskService.updateTask(req.params.id, { status: req.body.status });
-    if (!task) {
-      return res.status(404).json({ error: "Task not found" });
-    }
-    return successResponse(res, 200, "Task status updated successfully", task);
-  } catch (error) {
-    return errorResponse(res, 500, "Error updating task status", [error.message]);
+export const deleteTask = catchAsync(async (req, res, next) => {
+  const deleted = await TaskService.deleteTask(req.params.id);
+  if (!deleted) {
+    return next(new AppError("Task not found", 404));
   }
-};
+  return res.status(204).send();
+});
 
-export const getTaskStats = (req, res) => {
-  try {
-    const stats = TaskService.getStats();
-    return successResponse(res, 200, "Task stats retrieved successfully", stats);
-  } catch (error) {
-    return errorResponse(res, 500, "Error retrieving task stats", [error.message]);
-  }
-};
+export const getTaskStats = catchAsync(async (req, res, next) => {
+  const stats = await TaskService.getStats();
+  return successResponse(res, 200, "Task stats retrieved successfully", stats);
+});
 
-export const resetTasks = (req, res) => {
-  try {
-    TaskService.resetTasks();
-    return successResponse(res, 200, "Tasks reset to initial state successfully");
-  } catch (error) {
-    return errorResponse(res, 500, "Error resetting tasks", [error.message]);
-  }
-};
+export const resetTasks = catchAsync(async (req, res, next) => {
+  await TaskService.resetTasks();
+  return successResponse(res, 200, "Tasks reset to initial state successfully");
+});

@@ -5,9 +5,16 @@ export const notFoundHandler = (req, res, next) => {
 };
 
 export const errorHandler = (err, req, res, next) => {
-  console.error(err.stack);
   const statusCode = err.statusCode || 500;
   const message = err.message || 'Internal Server Error';
   
-  errorResponse(res, statusCode, message, process.env.NODE_ENV === 'development' ? [err.stack] : []);
+  if (process.env.NODE_ENV === 'development') {
+    console.error(err.stack);
+  }
+
+  return res.status(statusCode).json({
+    success: false,
+    message,
+    errors: process.env.NODE_ENV === 'development' ? [err.stack] : (err.errors || [])
+  });
 };
