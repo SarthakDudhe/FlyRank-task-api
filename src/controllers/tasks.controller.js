@@ -7,11 +7,15 @@ export const getTasks = (req, res) => {
       status: req.query.status,
       priority: req.query.priority,
       assignedTo: req.query.assignedTo,
-      search: req.query.search
+      search: req.query.search,
+      sortBy: req.query.sortBy,
+      order: req.query.order,
+      page: req.query.page,
+      limit: req.query.limit
     };
     
-    const tasks = TaskService.getAllTasks(filters);
-    return successResponse(res, 200, "Tasks retrieved successfully", tasks);
+    const result = TaskService.getAllTasks(filters);
+    return successResponse(res, 200, "Tasks retrieved successfully", result);
   } catch (error) {
     return errorResponse(res, 500, "Error retrieving tasks", [error.message]);
   }

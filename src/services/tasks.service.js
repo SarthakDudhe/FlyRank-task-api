@@ -21,7 +21,30 @@ export const getAllTasks = (filters = {}) => {
     );
   }
   
-  return tasks;
+  // Apply Sorting
+  const sortBy = filters.sortBy || 'createdAt';
+  const order = filters.order === 'asc' ? 1 : -1;
+  tasks.sort((a, b) => {
+    if (a[sortBy] < b[sortBy]) return -1 * order;
+    if (a[sortBy] > b[sortBy]) return 1 * order;
+    return 0;
+  });
+
+  // Apply Pagination
+  const page = parseInt(filters.page, 10) || 1;
+  const limit = parseInt(filters.limit, 10) || 10;
+  const startIndex = (page - 1) * limit;
+  const endIndex = page * limit;
+  
+  const paginatedTasks = tasks.slice(startIndex, endIndex);
+
+  return {
+    total: tasks.length,
+    page,
+    limit,
+    totalPages: Math.ceil(tasks.length / limit),
+    data: paginatedTasks
+  };
 };
 
 export const getTaskById = (id) => {

@@ -43,7 +43,11 @@ export const swaggerSpec = {
           { in: 'query', name: 'status', schema: { type: 'string' }, description: 'Filter by status' },
           { in: 'query', name: 'priority', schema: { type: 'string' }, description: 'Filter by priority' },
           { in: 'query', name: 'assignedTo', schema: { type: 'string' }, description: 'Filter by assigned user' },
-          { in: 'query', name: 'search', schema: { type: 'string' }, description: 'Search title or description' }
+          { in: 'query', name: 'search', schema: { type: 'string' }, description: 'Search title or description' },
+          { in: 'query', name: 'sortBy', schema: { type: 'string', default: 'createdAt' }, description: 'Sort field (e.g., createdAt, title)' },
+          { in: 'query', name: 'order', schema: { type: 'string', enum: ['asc', 'desc'], default: 'desc' }, description: 'Sort order' },
+          { in: 'query', name: 'page', schema: { type: 'integer', default: 1 }, description: 'Page number' },
+          { in: 'query', name: 'limit', schema: { type: 'integer', default: 10 }, description: 'Items per page' }
         ],
         responses: {
           '200': { description: 'Successful response' }
