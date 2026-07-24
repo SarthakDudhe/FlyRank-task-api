@@ -1,0 +1,119 @@
+export const swaggerSpec = {
+  openapi: '3.0.0',
+  info: {
+    title: 'Antigravity Task API',
+    version: '1.0.0',
+    description: 'Task Management API for Antigravity',
+  },
+  servers: [
+    {
+      url: 'http://localhost:3000',
+      description: 'Development server',
+    },
+  ],
+  components: {
+    schemas: {
+      Task: {
+        type: 'object',
+        required: ['title', 'description', 'priority', 'assignedTo'],
+        properties: {
+          id: { type: 'string', description: 'Auto-generated UUID' },
+          title: { type: 'string' },
+          description: { type: 'string' },
+          priority: { type: 'string', enum: ['Low', 'Medium', 'High'] },
+          status: { type: 'string', enum: ['Pending', 'In Progress', 'Done'] },
+          assignedTo: { type: 'string' },
+          completed: { type: 'boolean' },
+          createdAt: { type: 'string', format: 'date-time' },
+          updatedAt: { type: 'string', format: 'date-time' }
+        }
+      }
+    }
+  },
+  paths: {
+    '/tasks': {
+      get: {
+        summary: 'Get all tasks',
+        description: 'Returns all tasks, optionally filtered by status, priority, assignedTo, or search string',
+        parameters: [
+          { in: 'query', name: 'status', schema: { type: 'string' }, description: 'Filter by status' },
+          { in: 'query', name: 'priority', schema: { type: 'string' }, description: 'Filter by priority' },
+          { in: 'query', name: 'assignedTo', schema: { type: 'string' }, description: 'Filter by assigned user' },
+          { in: 'query', name: 'search', schema: { type: 'string' }, description: 'Search title or description' }
+        ],
+        responses: {
+          '200': { description: 'Successful response' }
+        }
+      },
+      post: {
+        summary: 'Create a new task',
+        description: 'Creates a task and returns it',
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['title', 'description', 'priority', 'assignedTo'],
+                properties: {
+                  title: { type: 'string' },
+                  description: { type: 'string' },
+                  priority: { type: 'string', enum: ['Low', 'Medium', 'High'] },
+                  assignedTo: { type: 'string' }
+                }
+              }
+            }
+          }
+        },
+        responses: {
+          '201': { description: 'Task created successfully' },
+          '400': { description: 'Validation errors' }
+        }
+      }
+    },
+    '/tasks/{id}': {
+      get: {
+        summary: 'Get task by ID',
+        parameters: [{ in: 'path', name: 'id', required: true, schema: { type: 'string' } }],
+        responses: {
+          '200': { description: 'Successful response' },
+          '404': { description: 'Task not found' }
+        }
+      },
+      put: {
+        summary: 'Update a task',
+        parameters: [{ in: 'path', name: 'id', required: true, schema: { type: 'string' } }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  title: { type: 'string' },
+                  description: { type: 'string' },
+                  priority: { type: 'string' },
+                  status: { type: 'string' },
+                  assignedTo: { type: 'string' },
+                  completed: { type: 'boolean' }
+                }
+              }
+            }
+          }
+        },
+        responses: {
+          '200': { description: 'Task updated successfully' },
+          '404': { description: 'Task not found' }
+        }
+      },
+      delete: {
+        summary: 'Delete a task',
+        parameters: [{ in: 'path', name: 'id', required: true, schema: { type: 'string' } }],
+        responses: {
+          '204': { description: 'Task deleted successfully' },
+          '404': { description: 'Task not found' }
+        }
+      }
+    }
+  }
+};
