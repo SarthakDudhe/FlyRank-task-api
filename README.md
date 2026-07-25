@@ -23,11 +23,12 @@ backend/
 ├── src/
 │   ├── config/          # Database connection and Swagger configuration
 │   ├── controllers/     # Request/Response logic
-│   ├── middleware/      # Custom middlewares (Validation, Error handler, 404 handler)
+│   ├── middleware/      # Custom middlewares (Validation checker, Error handler, 404 handler)
 │   ├── models/          # Mongoose schemas and models
 │   ├── routes/          # Express route definitions
 │   ├── services/        # Business logic and database queries
 │   ├── utils/           # Helper classes and response formatters
+│   ├── validators/      # express-validator schema definitions
 │   ├── app.js           # Express application setup
 │   └── server.js        # Server entry point & DB connection initialization
 ├── .env                 # Environment variables
