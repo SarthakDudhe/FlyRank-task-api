@@ -1,4 +1,4 @@
-import { body, validationResult } from 'express-validator';
+import { body, param, validationResult } from 'express-validator';
 import { errorResponse } from '../utils/response.js';
 
 // Reusable validation result checker
@@ -41,3 +41,8 @@ export const updateTaskValidation = [
 export const updateTaskStatusValidation = [
   body('status').notEmpty().withMessage('Status is required').isIn(['Pending', 'In Progress', 'Done']).withMessage('Invalid status')
 ];
+
+export const taskIdValidation = [
+  param('id').isMongoId().withMessage('Invalid Task ID format')
+];
+

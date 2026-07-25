@@ -1,79 +1,99 @@
-import { TaskModel } from '../models/tasks.model.js';
+import { Task, initialTasks } from '../models/tasks.model.js';
 
-export const getAllTasks = (filters = {}) => {
-  let tasks = TaskModel.findAll();
-  
-  // Apply filters
+export const getAllTasks = async (filters = {}) => {
+  const query = {};
+
+  // Apply filters with case-insensitive matching
   if (filters.status) {
-    tasks = tasks.filter(t => t.status.toLowerCase() === filters.status.toLowerCase());
+    query.status = new RegExp(`^${filters.status}$`, 'i');
   }
   if (filters.priority) {
-    tasks = tasks.filter(t => t.priority.toLowerCase() === filters.priority.toLowerCase());
+    query.priority = new RegExp(`^${filters.priority}$`, 'i');
   }
   if (filters.assignedTo) {
-    tasks = tasks.filter(t => t.assignedTo.toLowerCase() === filters.assignedTo.toLowerCase());
+    query.assignedTo = new RegExp(`^${filters.assignedTo}$`, 'i');
   }
   if (filters.search) {
-    const searchLower = filters.search.toLowerCase();
-    tasks = tasks.filter(t => 
-      t.title.toLowerCase().includes(searchLower) || 
-      t.description.toLowerCase().includes(searchLower)
-    );
+    query.$or = [
+      { title: { $regex: filters.search, $options: 'i' } },
+      { description: { $regex: filters.search, $options: 'i' } }
+    ];
   }
-  
+
   // Apply Sorting
   const sortBy = filters.sortBy || 'createdAt';
   const order = filters.order === 'asc' ? 1 : -1;
-  tasks.sort((a, b) => {
-    if (a[sortBy] < b[sortBy]) return -1 * order;
-    if (a[sortBy] > b[sortBy]) return 1 * order;
-    return 0;
-  });
 
   // Apply Pagination
   const page = parseInt(filters.page, 10) || 1;
   const limit = parseInt(filters.limit, 10) || 10;
-  const startIndex = (page - 1) * limit;
-  const endIndex = page * limit;
-  
-  const paginatedTasks = tasks.slice(startIndex, endIndex);
+  const skip = (page - 1) * limit;
+
+  const total = await Task.countDocuments(query);
+  const paginatedTasks = await Task.find(query)
+    .sort({ [sortBy]: order })
+    .skip(skip)
+    .limit(limit);
 
   return {
-    total: tasks.length,
+    total,
     page,
     limit,
-    totalPages: Math.ceil(tasks.length / limit),
+    totalPages: Math.ceil(total / limit),
     data: paginatedTasks
   };
 };
 
-export const getTaskById = (id) => {
-  return TaskModel.findById(id);
+export const getTaskById = async (id) => {
+  return await Task.findById(id);
 };
 
-export const createTask = (taskData) => {
-  return TaskModel.create(taskData);
+export const createTask = async (taskData) => {
+  const task = await Task.create(taskData);
+  return task;
 };
 
-export const updateTask = (id, updateData) => {
-  return TaskModel.update(id, updateData);
+export const updateTask = async (id, updateData) => {
+  const dataToUpdate = { ...updateData };
+
+  // Automatically manage completed state based on status if completed flag wasn't explicitly set
+  if (dataToUpdate.status === 'Done' && dataToUpdate.completed === undefined) {
+    dataToUpdate.completed = true;
+  } else if (dataToUpdate.status && dataToUpdate.status !== 'Done' && dataToUpdate.completed === undefined) {
+    dataToUpdate.completed = false;
+  }
+
+  return await Task.findByIdAndUpdate(id, dataToUpdate, {
+    new: true,
+    runValidators: true
+  });
 };
 
-export const deleteTask = (id) => {
-  return TaskModel.delete(id);
+export const deleteTask = async (id) => {
+  const result = await Task.findByIdAndDelete(id);
+  return !!result;
 };
 
-export const getStats = () => {
-  const tasks = TaskModel.findAll();
+export const getStats = async () => {
+  const [totalTasks, completedTasks, pendingTasks, highPriority, lowPriority] = await Promise.all([
+    Task.countDocuments({}),
+    Task.countDocuments({ completed: true }),
+    Task.countDocuments({ completed: false }),
+    Task.countDocuments({ priority: 'High' }),
+    Task.countDocuments({ priority: 'Low' })
+  ]);
+
   return {
-    totalTasks: tasks.length,
-    completedTasks: tasks.filter(t => t.completed).length,
-    pendingTasks: tasks.filter(t => !t.completed).length,
-    highPriority: tasks.filter(t => t.priority === 'High').length,
-    lowPriority: tasks.filter(t => t.priority === 'Low').length
+    totalTasks,
+    completedTasks,
+    pendingTasks,
+    highPriority,
+    lowPriority
   };
 };
 
-export const resetTasks = () => {
-  return TaskModel.reset();
+export const resetTasks = async () => {
+  await Task.deleteMany({});
+  const tasks = await Task.insertMany(initialTasks);
+  return tasks;
 };

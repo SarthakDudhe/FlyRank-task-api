@@ -1,12 +1,16 @@
 import http from 'http';
 import app from './app.js';
+import { connectDB } from './config/database.js';
 
 const PORT = process.env.PORT || 3000;
 const server = http.createServer(app);
 
-server.listen(PORT, () => {
-  console.log(`🚀 Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
-  console.log(`📄 Swagger Docs available at http://localhost:${PORT}/docs`);
+// Connect to MongoDB then start server
+connectDB().then(() => {
+  server.listen(PORT, () => {
+    console.log(`🚀 Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+    console.log(`📄 Swagger Docs available at http://localhost:${PORT}/docs`);
+  });
 });
 
 // Handle unhandled promise rejections

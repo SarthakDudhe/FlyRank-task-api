@@ -1,87 +1,98 @@
-import { v4 as uuidv4 } from 'uuid';
+import mongoose from 'mongoose';
 
-// Seed initial realistic tasks
-const initialTasks = [
+export const initialTasks = [
   {
-    id: uuidv4(),
     title: "Implement Community Feed",
     description: "Build infinite scrolling feed for FlyRank AI platform",
     priority: "High",
     status: "In Progress",
     assignedTo: "Sarthak Dudhe",
-    completed: false,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+    completed: false
   },
   {
-    id: uuidv4(),
     title: "Setup User Authentication",
     description: "Integrate JWT based auth system",
     priority: "High",
     status: "Pending",
     assignedTo: "Backend Team",
-    completed: false,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+    completed: false
   },
   {
-    id: uuidv4(),
     title: "Design Landing Page",
     description: "Create responsive UI for FlyRank AI home page",
     priority: "Medium",
     status: "Done",
     assignedTo: "Frontend Team",
-    completed: true,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+    completed: true
   }
 ];
 
-// In-memory store
-let tasks = [...initialTasks];
-
-export const TaskModel = {
-  findAll: () => tasks,
-  findById: (id) => tasks.find(t => t.id === id),
-  create: (taskData) => {
-    const newTask = {
-      id: uuidv4(),
-      ...taskData,
-      status: taskData.status || "Pending",
-      completed: taskData.completed || false,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
-    tasks.push(newTask);
-    return newTask;
-  },
-  update: (id, updateData) => {
-    const index = tasks.findIndex(t => t.id === id);
-    if (index === -1) return null;
-    
-    tasks[index] = {
-      ...tasks[index],
-      ...updateData,
-      updatedAt: new Date().toISOString()
-    };
-    
-    // Automatically manage completed state based on status if completed flag wasn't explicitly set
-    if (updateData.status === 'Done' && updateData.completed === undefined) {
-      tasks[index].completed = true;
-    } else if (updateData.status && updateData.status !== 'Done' && updateData.completed === undefined) {
-      tasks[index].completed = false;
+const taskSchema = new mongoose.Schema(
+  {
+    title: {
+      type: String,
+      required: [true, 'Title is required'],
+      trim: true
+    },
+    description: {
+      type: String,
+      required: [true, 'Description is required'],
+      trim: true
+    },
+    priority: {
+      type: String,
+      required: [true, 'Priority is required'],
+      enum: {
+        values: ['Low', 'Medium', 'High'],
+        message: 'Priority must be Low, Medium, or High'
+      }
+    },
+    status: {
+      type: String,
+      enum: {
+        values: ['Pending', 'In Progress', 'Done'],
+        message: 'Invalid status'
+      },
+      default: 'Pending'
+    },
+    assignedTo: {
+      type: String,
+      required: [true, 'AssignedTo is required'],
+      trim: true
+    },
+    completed: {
+      type: Boolean,
+      default: false
     }
-    
-    return tasks[index];
   },
-  delete: (id) => {
-    const index = tasks.findIndex(t => t.id === id);
-    if (index === -1) return false;
-    tasks.splice(index, 1);
-    return true;
-  },
-  reset: () => {
-    tasks = [...initialTasks];
-    return tasks;
+  {
+    timestamps: true
   }
-};
+);
+
+// Add Indexes for common query fields
+taskSchema.index({ status: 1 });
+taskSchema.index({ priority: 1 });
+taskSchema.index({ assignedTo: 1 });
+
+// Transform output to replace _id with id and remove __v
+taskSchema.set('toJSON', {
+  transform: (doc, ret) => {
+    ret.id = ret._id.toString();
+    delete ret._id;
+    delete ret.__v;
+    return ret;
+  }
+});
+
+taskSchema.set('toObject', {
+  transform: (doc, ret) => {
+    ret.id = ret._id.toString();
+    delete ret._id;
+    delete ret.__v;
+    return ret;
+  }
+});
+
+export const Task = mongoose.model('Task', taskSchema);
+export default Task;
