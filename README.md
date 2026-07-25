@@ -31,7 +31,6 @@ backend/
 │   ├── app.js           # Express application setup
 │   └── server.js        # Server entry point & DB connection initialization
 ├── .env                 # Environment variables
-├── .env.example         # Template for environment variables
 ├── package.json         # Project dependencies and scripts
 └── README.md            # Project documentation
 ```
@@ -48,10 +47,7 @@ backend/
    npm install
    ```
 3. **Configure environment variables**:
-   Copy `.env.example` to `.env` and adjust values as needed:
-   ```bash
-   cp .env.example .env
-   ```
+   Create a `.env` file in the root directory and adjust values as needed.
 4. **Ensure MongoDB is running**:
    Make sure a local MongoDB server is running on port `27017` or update `MONGODB_URI` in `.env` to point to a MongoDB Atlas cluster.
 
